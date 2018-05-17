@@ -1,5 +1,5 @@
 def dijkstra(edges, neighbors, initial, end):
-    visited = {initial : 0}
+    visited = {initial: 0}
     passed = set()
     path = {}
 
@@ -23,37 +23,60 @@ def dijkstra(edges, neighbors, initial, end):
         if not node:
             return None
         path_list.append(node)
+    result_weight = find_result_weight(edges, initial, path_list)
+    return path_list[::-1], result_weight
+
+
+def find_result_weight(edges, initial, path_list):
     result_weight = 1
     prev_node = initial
     for step in path_list[::-1][1:]:
         result_weight *= edges[(prev_node, step)]
         prev_node = step
-    return path_list[::-1], result_weight
+    return result_weight
 
 
 def make_edges(input):
-    graph = {}
+    """
+    :param input: массив массивов вида [[вершина, вес, ...], ...]
+    :return: возвращает словарь ребер {(нач. вершина, кон. вершина), вес}
+    """
+    edges = {}
     for i in range(len(input)):
         for j in range(0, len(input[i]), 2):
-            graph.update({ (input[i][j], i+1) : input[i][j+1] })
-    return graph
+            edges.update({(input[i][j], i+1): input[i][j+1]})
+    return edges
 
 
-if __name__ == '__main__':
-    lines = [a for a in open("in.txt").read().splitlines()]
-    end = int(lines.pop())
-    initial = int(lines.pop())
-    nodes = [[int(b) for b in a.split()[:-1:]]
-             for a in lines[1::]]
-    edges = make_edges(nodes)
+def group_by_neighbors(edges):
+    """
+    :param edges: словарь ребер {(нач. вершина, кон. вершина), вес}
+    :return: словарь соседей {вершина: [соседи], ...}
+    """
     neighbors = dict()
     for x, y in edges:
         if neighbors.get(x):
             neighbors[x].append(y)
         else:
             neighbors[x] = [y]
+    return neighbors
+
+
+def main():
+    lines = [a for a in open("in.txt").read().splitlines()]
+    end = int(lines.pop())
+    initial = int(lines.pop())
+    nodes = [[int(b) for b in a.split()[:-1:]]
+             for a in lines[1::]]
+    edges = make_edges(nodes)
+    neighbors = group_by_neighbors(edges)
     result = dijkstra(edges, neighbors, initial, end)
+
     if result:
         open("out.txt", "w").write("Y\n{}\n{}".format(" ".join(map(str, result[0])), str(result[1])))
     else:
         open("out.txt", "w").write("N")
+
+
+if __name__ == '__main__':
+    main()
