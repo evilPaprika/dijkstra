@@ -1,5 +1,5 @@
 def dijkstra(edges, neighbors, initial, end):
-    visited = {initial: 0}
+    visited = {initial: 1}
     passed = set()
     path = {}
 
@@ -11,7 +11,7 @@ def dijkstra(edges, neighbors, initial, end):
         passed.add(min_path_node)
 
         for adjacent_node in neighbors.get(min_path_node, []):
-            weight = visited[min_path_node] + edges[(min_path_node, adjacent_node)]
+            weight = visited[min_path_node] * edges[(min_path_node, adjacent_node)]
             if adjacent_node not in visited or weight < visited[adjacent_node]:
                 visited[adjacent_node] = weight
                 path[adjacent_node] = min_path_node
@@ -71,7 +71,6 @@ def main():
     edges = make_edges(nodes)
     neighbors = group_by_neighbors(edges)
     result = dijkstra(edges, neighbors, initial, end)
-
     if result:
         open("out.txt", "w").write("Y\n{}\n{}".format(" ".join(map(str, result[0])), str(result[1])))
     else:
